@@ -1,0 +1,546 @@
+/* ============================================
+   TRUFlow — Global Styles
+   ============================================ */
+
+:root {
+  --color-bg: #1a1a2e;
+  --color-panel: #16213e;
+  --color-panel-border: #0f3460;
+  --color-accent: #e94560;
+  --color-accent-hover: #ff6b81;
+  --color-text: #eaeaea;
+  --color-text-muted: #8a8a9a;
+  --color-input-bg: #0f3460;
+  --color-input-border: #1a4a7a;
+  --color-card-bg: #1a3a5c;
+  --color-success: #27ae60;
+  --color-warning: #f39c12;
+  --color-danger: #e74c3c;
+  --color-high: #e74c3c;
+  --color-medium: #f39c12;
+  --color-low: #3498db;
+
+  --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --font-mono: 'Consolas', 'Courier New', monospace;
+
+  --radius: 8px;
+  --radius-sm: 4px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-text);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ============================================
+   Header
+   ============================================ */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  background: var(--color-panel);
+  border-bottom: 2px solid var(--color-panel-border);
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 1px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.header-btn {
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-border);
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.header-btn:hover {
+  background: var(--color-panel-border);
+}
+
+/* ============================================
+   Dashboard — Three-Panel Layout
+   ============================================ */
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 280px 1fr 280px;
+  gap: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel {
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 1px solid var(--color-panel-border);
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+.panel-left {
+  background: var(--color-panel);
+}
+
+.panel-center {
+  background: var(--color-bg);
+}
+
+.panel-right {
+  background: var(--color-panel);
+}
+
+.panel-heading {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.placeholder-text {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* ============================================
+   Pomodoro Timer
+   ============================================ */
+
+.pomo-section {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-panel-border);
+  margin-bottom: 16px;
+}
+
+.pomo-display {
+  font-family: var(--font-mono);
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 8px 0;
+}
+
+.pomo-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pomo-btn {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.pomo-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.pomo-btn-secondary {
+  background: var(--color-input-bg);
+}
+
+.pomo-btn-secondary:hover {
+  background: var(--color-panel-border);
+}
+
+.pomo-adj {
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-border);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.pomo-adj:hover {
+  background: var(--color-panel-border);
+}
+
+.pomo-status {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* Flash animation for timer completion */
+.pomo-flash {
+  animation: flash 0.5s ease-in-out 3;
+}
+
+@keyframes flash {
+  0%, 100% { color: var(--color-text); }
+  50% { color: var(--color-accent); }
+}
+
+/* ============================================
+   Time Tracker (Clock In/Out)
+   ============================================ */
+
+.tracker-section {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-panel-border);
+  margin-bottom: 16px;
+}
+
+.tracker-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tracker-select {
+  flex: 1;
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-border);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.tracker-btn {
+  background: var(--color-success);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.tracker-btn:hover {
+  opacity: 0.9;
+}
+
+.tracker-btn.clocked-in {
+  background: var(--color-danger);
+}
+
+.tracker-elapsed {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.tracker-elapsed.active {
+  color: var(--color-success);
+}
+
+/* ============================================
+   Project Details (Left Panel — Bottom)
+   ============================================ */
+
+.project-details {
+  flex: 1;
+}
+
+.project-details-content {
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+/* ============================================
+   Kanban Board
+   ============================================ */
+
+.kanban-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.kanban-add-btn {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.kanban-add-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.kanban-board {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  height: calc(100% - 48px);
+  padding-bottom: 8px;
+}
+
+.kanban-column {
+  min-width: 180px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.column-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  padding: 8px;
+  background: var(--color-panel);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  text-align: center;
+}
+
+.column-cards {
+  flex: 1;
+  background: rgba(22, 33, 62, 0.5);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  padding: 8px;
+  overflow-y: auto;
+  min-height: 100px;
+}
+
+/* Kanban card styles (placeholder for Phase 4) */
+.kanban-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: grab;
+  border-left: 3px solid var(--color-accent);
+  box-shadow: var(--shadow);
+  font-size: 0.85rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.kanban-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.kanban-card.dragging {
+  opacity: 0.5;
+}
+
+.column-cards.drag-over {
+  background: rgba(233, 69, 96, 0.1);
+}
+
+/* ============================================
+   To-Do List
+   ============================================ */
+
+.todo-add {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.todo-input {
+  flex: 1;
+  background: var(--color-input-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-input-border);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.todo-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.todo-add-btn {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.todo-add-btn:hover {
+  background: var(--color-accent-hover);
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--color-card-bg);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+}
+
+.todo-item input[type="checkbox"] {
+  accent-color: var(--color-accent);
+}
+
+.todo-item.completed .todo-text {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.todo-priority {
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 3px;
+  text-transform: uppercase;
+}
+
+.todo-priority.high { background: var(--color-high); color: #fff; }
+.todo-priority.medium { background: var(--color-medium); color: #fff; }
+.todo-priority.low { background: var(--color-low); color: #fff; }
+
+.overdue-heading {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-danger);
+  margin: 16px 0 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-panel-border);
+}
+
+/* ============================================
+   Modal
+   ============================================ */
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--color-panel);
+  border: 1px solid var(--color-panel-border);
+  border-radius: var(--radius);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-panel-border);
+}
+
+.modal-header h2 {
+  font-size: 1.1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: var(--color-text);
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* ============================================
+   Scrollbar styling
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-panel-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-input-border);
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TRUFlow — Test Suite</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: #1a1a2e;
+      color: #eaeaea;
+      padding: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 { color: #e94560; margin-bottom: 8px; }
+    .summary {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      padding: 12px;
+      border-radius: 6px;
+    }
+    .summary.pass { background: rgba(39, 174, 96, 0.2); border: 1px solid #27ae60; }
+    .summary.fail { background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; }
+    .suite { margin-bottom: 20px; }
+    .suite-name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #8a8a9a;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .test { padding: 6px 12px; font-size: 0.9rem; border-radius: 4px; margin-bottom: 4px; }
+    .test.pass { background: rgba(39, 174, 96, 0.1); }
+    .test.fail { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+    .test .label { margin-right: 8px; }
+    .test .label.pass { color: #27ae60; }
+    .test .label.fail { color: #e74c3c; }
+  </style>
+</head>
+<body>
+  <h1>TRUFlow Test Suite</h1>
+  <div id="summary" class="summary"></div>
+  <div id="results"></div>
+
+  <!-- Test framework -->
+  <script>
+    const TestRunner = (() => {
+      const suites = [];
+      let currentSuite = null;
+
+      function describe(name, fn) {
+        currentSuite = { name, tests: [] };
+        suites.push(currentSuite);
+        fn();
+        currentSuite = null;
+      }
+
+      function it(name, fn) {
+        const test = { name, passed: false, error: null };
+        try {
+          fn();
+          test.passed = true;
+        } catch (e) {
+          test.error = e.message;
+        }
+        currentSuite.tests.push(test);
+      }
+
+      function assert(condition, message) {
+        if (!condition) {
+          throw new Error(message || 'Assertion failed');
+        }
+      }
+
+      function assertEqual(actual, expected, message) {
+        if (actual !== expected) {
+          throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+        }
+      }
+
+      function assertDeepEqual(actual, expected, message) {
+        if (JSON.stringify(actual) !== JSON.stringify(expected)) {
+          throw new Error(message || `Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+        }
+      }
+
+      function run() {
+        const resultsEl = document.getElementById('results');
+        const summaryEl = document.getElementById('summary');
+        let totalPass = 0;
+        let totalFail = 0;
+
+        suites.forEach(suite => {
+          const suiteEl = document.createElement('div');
+          suiteEl.className = 'suite';
+
+          const nameEl = document.createElement('div');
+          nameEl.className = 'suite-name';
+          nameEl.textContent = suite.name;
+          suiteEl.appendChild(nameEl);
+
+          suite.tests.forEach(test => {
+            const testEl = document.createElement('div');
+            testEl.className = `test ${test.passed ? 'pass' : 'fail'}`;
+
+            const label = test.passed ? 'PASS' : 'FAIL';
+            testEl.innerHTML = `<span class="label ${test.passed ? 'pass' : 'fail'}">${label}</span> ${test.name}`;
+            if (test.error) {
+              testEl.innerHTML += `<br><small style="color:#e74c3c;margin-left:48px;">${test.error}</small>`;
+            }
+
+            suiteEl.appendChild(testEl);
+            test.passed ? totalPass++ : totalFail++;
+          });
+
+          resultsEl.appendChild(suiteEl);
+        });
+
+        const total = totalPass + totalFail;
+        const allPassed = totalFail === 0;
+        summaryEl.className = `summary ${allPassed ? 'pass' : 'fail'}`;
+        summaryEl.textContent = `${totalPass}/${total} tests passed${totalFail > 0 ? ` (${totalFail} failed)` : ''}`;
+      }
+
+      return { describe, it, assert, assertEqual, assertDeepEqual, run };
+    })();
+
+    // Shorthand
+    const { describe, it, assert, assertEqual, assertDeepEqual } = TestRunner;
+  </script>
+
+  <!-- Source files under test -->
+  <script src="../js/storage.js"></script>
+
+  <!-- Test files -->
+  <script src="storage.test.js"></script>
+
+  <!-- Run all tests -->
+  <script>
+    TestRunner.run();
+  </script>
+</body>
+</html>

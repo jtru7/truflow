@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRUFlow</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1 class="app-title">TRUFlow</h1>
+    <div class="header-actions">
+      <button id="btn-settings" class="header-btn" title="Settings">Settings</button>
+      <button id="btn-sync" class="header-btn" title="Sync to Google Sheets">Sync</button>
+      <button id="btn-restore" class="header-btn" title="Restore from Google Sheets">Restore</button>
+    </div>
+  </header>
+
+  <main class="dashboard">
+    <!-- LEFT PANEL: Pomodoro + Time Tracker + Project Details -->
+    <section class="panel panel-left">
+      <div class="pomo-section">
+        <h2 class="panel-heading">Pomodoro</h2>
+        <div id="pomo-display" class="pomo-display">25:00</div>
+        <div class="pomo-controls">
+          <button id="pomo-minus" class="pomo-adj" title="Subtract 1 minute">-1</button>
+          <button id="pomo-start" class="pomo-btn">Start</button>
+          <button id="pomo-reset" class="pomo-btn pomo-btn-secondary">Reset</button>
+          <button id="pomo-plus" class="pomo-adj" title="Add 1 minute">+1</button>
+        </div>
+        <div id="pomo-status" class="pomo-status">Work Session</div>
+      </div>
+
+      <div class="tracker-section">
+        <h2 class="panel-heading">Currently Working On</h2>
+        <div class="tracker-controls">
+          <select id="tracker-bucket" class="tracker-select">
+            <option value="">-- Select Bucket --</option>
+          </select>
+          <button id="tracker-toggle" class="tracker-btn">Clock In</button>
+        </div>
+        <div id="tracker-elapsed" class="tracker-elapsed">0:00:00</div>
+      </div>
+
+      <div id="project-details" class="project-details">
+        <h2 class="panel-heading">Project Details</h2>
+        <div id="project-details-content" class="project-details-content">
+          <p class="placeholder-text">Clock into a project to see its details here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER PANEL: Kanban Board -->
+    <section class="panel panel-center">
+      <div class="kanban-header">
+        <h2 class="panel-heading">Project Status</h2>
+        <button id="btn-add-project" class="kanban-add-btn" title="Add new project">+ New Project</button>
+      </div>
+      <div id="kanban-board" class="kanban-board">
+        <div class="kanban-column" data-column="queue">
+          <h3 class="column-title">Queue</h3>
+          <div class="column-cards" data-column="queue"></div>
+        </div>
+        <div class="kanban-column" data-column="in-progress">
+          <h3 class="column-title">In Progress</h3>
+          <div class="column-cards" data-column="in-progress"></div>
+        </div>
+        <div class="kanban-column" data-column="on-hold">
+          <h3 class="column-title">On Hold</h3>
+          <div class="column-cards" data-column="on-hold"></div>
+        </div>
+        <div class="kanban-column" data-column="done">
+          <h3 class="column-title">Done</h3>
+          <div class="column-cards" data-column="done"></div>
+        </div>
+        <div class="kanban-column" data-column="backburner">
+          <h3 class="column-title">Backburner</h3>
+          <div class="column-cards" data-column="backburner"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Daily To-Do List -->
+    <section class="panel panel-right">
+      <h2 class="panel-heading">To-Do List</h2>
+      <div class="todo-add">
+        <input type="text" id="todo-input" class="todo-input" placeholder="Add a task...">
+        <button id="btn-add-todo" class="todo-add-btn">+</button>
+      </div>
+      <div id="todo-list" class="todo-list">
+        <p class="placeholder-text">No tasks yet. Add one above.</p>
+      </div>
+      <div id="todo-overdue-section" class="todo-overdue-section" style="display:none;">
+        <h3 class="overdue-heading">Overdue</h3>
+        <div id="todo-overdue-list" class="todo-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button id="settings-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="placeholder-text">Settings will be available in a future phase.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
