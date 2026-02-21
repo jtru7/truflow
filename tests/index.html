@@ -130,14 +130,116 @@
     const { describe, it, assert, assertEqual, assertDeepEqual } = TestRunner;
   </script>
 
+  <!-- Stub DOM elements required by Pomodoro module (hidden) -->
+  <div style="display:none">
+    <div id="pomo-display">25:00</div>
+    <button id="pomo-start">Start</button>
+    <button id="pomo-reset">Reset</button>
+    <button id="pomo-minus">-1</button>
+    <button id="pomo-plus">+1</button>
+    <div id="pomo-status">Work Session</div>
+  </div>
+
+  <!-- Stub DOM elements required by TimeTracker module (hidden) -->
+  <div style="display:none">
+    <select id="tracker-bucket">
+      <option value="">-- Select Bucket --</option>
+      <option value="Email">Email</option>
+      <option value="Meetings">Meetings</option>
+    </select>
+    <button id="tracker-toggle">Clock In</button>
+    <div id="tracker-elapsed">0:00:00</div>
+    <div id="tracker-start-time"></div>
+    <div id="tracker-weekly"></div>
+    <div id="tracker-logs"></div>
+    <!-- Log modal stubs -->
+    <div id="log-modal">
+      <div id="log-modal-bucket"></div>
+      <input type="date" id="log-date">
+      <input type="time" id="log-start">
+      <input type="time" id="log-end">
+      <button id="log-modal-close">×</button>
+      <button id="log-modal-cancel">Cancel</button>
+      <button id="log-modal-save">Save</button>
+      <button id="log-modal-delete">Delete</button>
+    </div>
+    <!-- Weekly report modal stub -->
+    <div id="weekly-report-modal">
+      <div id="weekly-report-body"></div>
+      <button id="weekly-report-close">×</button>
+    </div>
+  </div>
+
+  <!-- Stub DOM elements required by Kanban module (hidden) -->
+  <div style="display:none">
+    <button id="btn-add-project">+ New Project</button>
+    <div id="kanban-board">
+      <div class="kanban-column" data-column="queue">
+        <div class="column-cards" data-column="queue"></div>
+      </div>
+      <div class="kanban-column" data-column="in-progress">
+        <div class="column-cards" data-column="in-progress"></div>
+      </div>
+      <div class="kanban-column" data-column="on-hold">
+        <div class="column-cards" data-column="on-hold"></div>
+      </div>
+      <div class="kanban-column" data-column="done">
+        <div class="column-cards" data-column="done"></div>
+      </div>
+      <div class="kanban-column" data-column="backburner">
+        <div class="column-cards" data-column="backburner"></div>
+      </div>
+    </div>
+    <!-- Card modal stubs -->
+    <div id="card-modal">
+      <h2 id="card-modal-title">New Project</h2>
+      <button id="card-modal-close">×</button>
+      <button id="card-modal-cancel">Cancel</button>
+      <button id="card-modal-save">Create</button>
+      <button id="card-modal-delete" style="display:none;">Delete</button>
+      <input type="text" id="card-name">
+      <textarea id="card-description"></textarea>
+      <select id="card-column">
+        <option value="queue">Queue</option>
+        <option value="in-progress">In Progress</option>
+        <option value="on-hold">On Hold</option>
+        <option value="done">Done</option>
+        <option value="backburner">Backburner</option>
+      </select>
+      <div id="card-labels-list"></div>
+      <input type="text" id="card-label-input">
+      <button id="card-label-add-btn">+</button>
+      <div id="card-checklist-list"></div>
+      <input type="text" id="card-checklist-input">
+      <button id="card-checklist-add-btn">+</button>
+      <input type="radio" name="card-priority" value="H">
+      <input type="radio" name="card-priority" value="M">
+      <input type="radio" name="card-priority" value="L">
+      <input type="radio" name="card-priority" value="">
+    </div>
+  </div>
+
   <!-- Source files under test -->
   <script src="../js/storage.js"></script>
+  <script src="../js/pomodoro.js"></script>
+  <script src="../js/timeTracker.js"></script>
+  <script src="../js/kanban.js"></script>
 
   <!-- Test files -->
   <script src="storage.test.js"></script>
+  <script src="pomodoro.test.js"></script>
+  <script src="timeTracker.test.js"></script>
+  <script src="kanban.test.js"></script>
 
   <!-- Run all tests -->
   <script>
+    // Seed defaults and initialize modules before running suites
+    Storage.clearAll();
+    Storage.initDefaults();
+    Pomodoro.init();
+    TimeTracker.init();
+    Kanban.init();
+
     TestRunner.run();
   </script>
 </body>

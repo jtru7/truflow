@@ -40,6 +40,9 @@
           <button id="tracker-toggle" class="tracker-btn">Clock In</button>
         </div>
         <div id="tracker-elapsed" class="tracker-elapsed">0:00:00</div>
+        <div id="tracker-start-time" class="tracker-start-time" style="display:none;"></div>
+        <div id="tracker-weekly" class="tracker-weekly"></div>
+        <div id="tracker-logs" class="tracker-logs"></div>
       </div>
 
       <div id="project-details" class="project-details">
@@ -110,7 +113,115 @@
     </div>
   </div>
 
+  <!-- Card Modal (Add / Edit Project) -->
+  <div id="card-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="card-modal-title">New Project</h2>
+        <button id="card-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="card-field">
+          <label class="card-label">Name</label>
+          <input type="text" id="card-name" class="card-input" placeholder="Project name...">
+        </div>
+        <div class="card-field">
+          <label class="card-label">Priority</label>
+          <div class="card-priority-group">
+            <label class="priority-option priority-H"><input type="radio" name="card-priority" value="H"> High</label>
+            <label class="priority-option priority-M"><input type="radio" name="card-priority" value="M"> Med</label>
+            <label class="priority-option priority-L"><input type="radio" name="card-priority" value="L"> Low</label>
+            <label class="priority-option"><input type="radio" name="card-priority" value=""> None</label>
+          </div>
+        </div>
+        <div class="card-field">
+          <label class="card-label">Column</label>
+          <select id="card-column" class="card-select">
+            <option value="queue">Queue</option>
+            <option value="in-progress">In Progress</option>
+            <option value="on-hold">On Hold</option>
+            <option value="done">Done</option>
+            <option value="backburner">Backburner</option>
+          </select>
+        </div>
+        <div class="card-field">
+          <label class="card-label">Notes / Details</label>
+          <textarea id="card-description" class="card-input card-textarea" placeholder="Add context, links, or notes about this project..."></textarea>
+        </div>
+        <div class="card-field">
+          <label class="card-label">Labels</label>
+          <div id="card-labels-list" class="card-labels-list"></div>
+          <div class="card-add-row">
+            <input type="text" id="card-label-input" class="card-input card-input-sm" placeholder="Add label...">
+            <button id="card-label-add-btn" class="card-add-btn">+</button>
+          </div>
+        </div>
+        <div class="card-field">
+          <label class="card-label">Checklist</label>
+          <div id="card-checklist-list" class="card-checklist-list"></div>
+          <div class="card-add-row">
+            <input type="text" id="card-checklist-input" class="card-input card-input-sm" placeholder="Add item...">
+            <button id="card-checklist-add-btn" class="card-add-btn">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="card-modal-delete" class="card-btn-delete" style="display:none;">Delete</button>
+        <div class="modal-footer-actions">
+          <button id="card-modal-cancel" class="card-btn-secondary">Cancel</button>
+          <button id="card-modal-save" class="card-btn-primary">Create</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log Entry Edit Modal -->
+  <div id="log-modal" class="modal" style="display:none;">
+    <div class="modal-content modal-content-sm">
+      <div class="modal-header">
+        <h2>Edit Time Entry</h2>
+        <button id="log-modal-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="log-modal-bucket" class="log-modal-bucket"></div>
+        <div class="card-field">
+          <label class="card-label">Date</label>
+          <input type="date" id="log-date" class="card-input">
+        </div>
+        <div class="card-field">
+          <label class="card-label">Start Time</label>
+          <input type="time" id="log-start" class="card-input">
+        </div>
+        <div class="card-field">
+          <label class="card-label">End Time</label>
+          <input type="time" id="log-end" class="card-input">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="log-modal-delete" class="card-btn-delete">Delete</button>
+        <div class="modal-footer-actions">
+          <button id="log-modal-cancel" class="card-btn-secondary">Cancel</button>
+          <button id="log-modal-save" class="card-btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Report Modal -->
+  <div id="weekly-report-modal" class="modal" style="display:none;">
+    <div class="modal-content modal-content-md">
+      <div class="modal-header">
+        <h2>Weekly Time Report</h2>
+        <button id="weekly-report-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body" id="weekly-report-body"></div>
+    </div>
+  </div>
+
   <script src="js/storage.js"></script>
+  <script src="js/pomodoro.js"></script>
+  <script src="js/timeTracker.js"></script>
+  <script src="js/kanban.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
