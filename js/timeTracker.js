@@ -10,6 +10,7 @@ const TimeTracker = (() => {
   let intervalId = null;
   let _bound = false;
   let _editingLogId = null;
+  let _weekOffset = 0;      // 0 = current week, -1 = last week, etc.
 
   // DOM refs — populated in init()
   let bucketSelect, toggleBtn, elapsedDisplay, weeklyContainer,
@@ -218,12 +219,12 @@ const TimeTracker = (() => {
     return project ? project.name : bucketKey;
   }
 
-  function _getWeekStart() {
+  function _getWeekStart(offset) {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
     const day = d.getDay(); // 0=Sun, 1=Mon...
     const diff = day === 0 ? -6 : 1 - day; // back to Monday
-    d.setDate(d.getDate() + diff);
+    d.setDate(d.getDate() + diff + (offset || 0) * 7);
     return d;
   }
 
@@ -342,8 +343,18 @@ const TimeTracker = (() => {
 
   function _openWeeklyReport() {
     if (!weeklyReportModal || !weeklyReportBody) return;
-    weeklyReportBody.innerHTML = _buildWeeklyReportHTML();
+    _weekOffset = 0;
+    _refreshWeeklyReport();
     weeklyReportModal.style.display = 'flex';
+  }
+
+  function _refreshWeeklyReport() {
+    if (!weeklyReportBody) return;
+    weeklyReportBody.innerHTML = _buildWeeklyReportHTML();
+    const prevBtn = weeklyReportBody.querySelector('.wr-nav-prev');
+    const nextBtn = weeklyReportBody.querySelector('.wr-nav-next');
+    if (prevBtn) prevBtn.addEventListener('click', () => { _weekOffset--; _refreshWeeklyReport(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { _weekOffset++; _refreshWeeklyReport(); });
   }
 
   function _closeWeeklyReport() {
@@ -354,7 +365,7 @@ const TimeTracker = (() => {
     const MONTH_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const DAY_NAMES  = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
-    const weekStart = _getWeekStart();
+    const weekStart = _getWeekStart(_weekOffset);
     const weekEnd   = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
 
@@ -385,15 +396,21 @@ const TimeTracker = (() => {
     const weekTotal = dayTotals.reduce((a, b) => a + b, 0);
     const rangeStr  = `${MONTH_ABBR[weekStart.getMonth()]} ${weekStart.getDate()} \u2013 ${MONTH_ABBR[weekEnd.getMonth()]} ${weekEnd.getDate()}, ${weekEnd.getFullYear()}`;
 
+    const navHTML = `<div class="wr-nav">
+      <button class="wr-nav-btn wr-nav-prev">← Prev</button>
+      <span class="wr-range">${rangeStr}</span>
+      <button class="wr-nav-btn wr-nav-next"${_weekOffset === 0 ? ' disabled' : ''}>Next →</button>
+    </div>`;
+
     if (buckets.length === 0) {
-      return `<div class="wr-range">${rangeStr}</div><p class="placeholder-text" style="margin-top:12px;">No time logged this week.</p>`;
+      return `${navHTML}<p class="placeholder-text" style="margin-top:12px;">No time logged this week.</p>`;
     }
 
     buckets.sort((a, b) =>
       bucketDay[b].reduce((x, y) => x + y, 0) - bucketDay[a].reduce((x, y) => x + y, 0)
     );
 
-    let html = `<div class="wr-range">${rangeStr}</div>`;
+    let html = navHTML;
     html += `<div class="wr-grand-total">Week Total: <span>${formatElapsed(weekTotal)}</span></div>`;
     html += `<div class="wr-table-wrap"><table class="wr-table"><thead><tr>`;
     html += `<th class="wr-th-bucket"></th>`;

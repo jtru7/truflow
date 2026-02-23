@@ -18,9 +18,10 @@ const App = (() => {
     populateBucketDropdown();
     TimeTracker.init();
     Kanban.init();
+    TodoList.init();
 
-    // Wire up settings modal
-    setupSettingsModal();
+    Settings.init();
+    if (typeof SheetsSync !== 'undefined') SheetsSync.init();
 
     console.log('TRUFlow initialized.');
   }
@@ -47,26 +48,6 @@ const App = (() => {
       opt.value = `project:${project.id}`;
       opt.textContent = project.name;
       select.appendChild(opt);
-    });
-  }
-
-  function setupSettingsModal() {
-    const modal = document.getElementById('settings-modal');
-    const btnOpen = document.getElementById('btn-settings');
-    const btnClose = document.getElementById('settings-close');
-
-    btnOpen.addEventListener('click', () => {
-      modal.style.display = 'flex';
-    });
-
-    btnClose.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
     });
   }
 

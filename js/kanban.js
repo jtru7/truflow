@@ -11,7 +11,8 @@ const Kanban = (() => {
   // DOM refs — populated in init()
   let board, addBtn, modal, modalTitle, modalClose, modalCancel, modalSave,
       modalDelete, nameInput, descriptionInput, columnSelect, labelsList,
-      labelInput, labelAddBtn, checklistList, checklistInput, checklistAddBtn;
+      labelInput, labelAddBtn, checklistList, checklistInput, checklistAddBtn,
+      timeGoalInput;
 
   // Priority → border color map
   const PRIORITY_COLORS = {
@@ -41,6 +42,7 @@ const Kanban = (() => {
     checklistList    = document.getElementById('card-checklist-list');
     checklistInput   = document.getElementById('card-checklist-input');
     checklistAddBtn  = document.getElementById('card-checklist-add-btn');
+    timeGoalInput    = document.getElementById('card-time-goal');
 
     _renderAll();
 
@@ -53,7 +55,7 @@ const Kanban = (() => {
       labelAddBtn.addEventListener('click', _addLabel);
       checklistAddBtn.addEventListener('click', _addChecklistItem);
 
-      labelInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); _addLabel(); } });
+      // labelInput is now a <select> — no keydown Enter handler needed
       checklistInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); _addChecklistItem(); } });
       nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); _saveCard(); } });
 
@@ -81,14 +83,15 @@ const Kanban = (() => {
     // Clear each column
     board.querySelectorAll('.column-cards').forEach(col => { col.innerHTML = ''; });
 
+    const logs = Storage.getTimeLogs();
     Storage.getProjects().forEach(project => {
-      const cardEl = _buildCard(project);
+      const cardEl = _buildCard(project, logs);
       const col = board.querySelector(`.column-cards[data-column="${project.column}"]`);
       if (col) col.appendChild(cardEl);
     });
   }
 
-  function _buildCard(project) {
+  function _buildCard(project, logs) {
     const card = document.createElement('div');
     card.className = 'kanban-card';
     card.dataset.id = project.id;
@@ -142,6 +145,34 @@ const Kanban = (() => {
       card.appendChild(progressEl);
     }
 
+    // Total tracked time for this project
+    const totalSecs = (logs || [])
+      .filter(l => l.bucket === `project:${project.id}` && l.end)
+      .reduce((sum, l) => sum + Math.round((new Date(l.end) - new Date(l.start)) / 1000), 0);
+
+    const goalSecs = (project.timeGoal || 0) * 3600;
+
+    if (goalSecs > 0) {
+      const pct  = Math.min(100, Math.round((totalSecs / goalSecs) * 100));
+      const over = totalSecs >= goalSecs;
+      const goalEl = document.createElement('div');
+      goalEl.className = 'card-goal';
+      goalEl.innerHTML = `
+        <span class="card-goal-text${over ? ' card-goal-over' : ''}">
+          ${_fmtDuration(totalSecs)} of ${_fmtDuration(goalSecs)}
+        </span>
+        <div class="card-progress-bar">
+          <div class="${over ? 'card-goal-fill-over' : 'card-goal-fill'}"
+               style="width:${pct}%"></div>
+        </div>`;
+      card.appendChild(goalEl);
+    } else if (totalSecs > 0) {
+      const timeEl = document.createElement('div');
+      timeEl.className = 'card-time';
+      timeEl.textContent = _fmtDuration(totalSecs);
+      card.appendChild(timeEl);
+    }
+
     // Click to edit (ignore clicks on the progress bar checkboxes)
     card.addEventListener('click', () => _openEditModal(project.id));
 
@@ -158,8 +189,9 @@ const Kanban = (() => {
     columnSelect.value = 'queue';
     labelsList.innerHTML = '';
     checklistList.innerHTML = '';
-    labelInput.value = '';
+    _populateLabelSelect();
     checklistInput.value = '';
+    if (timeGoalInput) timeGoalInput.value = '';
     modalTitle.textContent = 'New Project';
     modalSave.textContent = 'Create';
     modalDelete.style.display = 'none';
@@ -181,13 +213,14 @@ const Kanban = (() => {
     // Populate labels
     labelsList.innerHTML = '';
     (project.labels || []).forEach(label => _appendLabelChip(label));
+    _populateLabelSelect();
 
     // Populate checklist
     checklistList.innerHTML = '';
     (project.checklist || []).forEach(item => _appendChecklistRow(item.id, item.text, item.done));
 
-    labelInput.value = '';
     checklistInput.value = '';
+    if (timeGoalInput) timeGoalInput.value = project.timeGoal || '';
     modalTitle.textContent = 'Edit Project';
     modalSave.textContent = 'Save';
     modalDelete.style.display = 'inline-block';
@@ -211,6 +244,7 @@ const Kanban = (() => {
     const column = columnSelect.value;
     const labels = _getLabels();
     const checklist = _getChecklist();
+    const timeGoal = parseFloat(timeGoalInput ? timeGoalInput.value : '') || 0;
 
     const projects = Storage.getProjects();
 
@@ -223,13 +257,14 @@ const Kanban = (() => {
         priority,
         labels,
         checklist,
+        timeGoal,
         createdAt: new Date().toISOString()
       };
       projects.push(newProject);
     } else {
       const idx = projects.findIndex(p => p.id === _editingId);
       if (idx !== -1) {
-        projects[idx] = { ...projects[idx], name, description, column, priority, labels, checklist };
+        projects[idx] = { ...projects[idx], name, description, column, priority, labels, checklist, timeGoal };
       }
     }
 
@@ -252,12 +287,29 @@ const Kanban = (() => {
 
   // ─── Labels ────────────────────────────────────────────────────────────────
 
+  function _populateLabelSelect() {
+    const labels = Storage.getSettings().labels || [];
+    labelInput.innerHTML = '';
+    const blank = document.createElement('option');
+    blank.value = '';
+    blank.textContent = labels.length ? '— pick a label —' : '(no labels in Settings)';
+    if (!labels.length) blank.disabled = true;
+    labelInput.appendChild(blank);
+    labels.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      labelInput.appendChild(opt);
+    });
+    labelInput.value = '';
+  }
+
   function _addLabel() {
-    const text = labelInput.value.trim();
+    const text = labelInput.value;
     if (!text) return;
+    if (_getLabels().includes(text)) { labelInput.value = ''; return; }
     _appendLabelChip(text);
     labelInput.value = '';
-    labelInput.focus();
   }
 
   function _appendLabelChip(text) {
@@ -386,6 +438,15 @@ const Kanban = (() => {
 
     col.classList.remove('drag-over');
     _renderAll();
+  }
+
+  // ─── Helpers ───────────────────────────────────────────────────────────────
+
+  function _fmtDuration(secs) {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    if (h > 0) return `${h}h ${m}m`;
+    return `${m}m`;
   }
 
   return { init, getState };

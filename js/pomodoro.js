@@ -11,7 +11,7 @@ const Pomodoro = (() => {
   let _bound = false;     // prevents duplicate event listeners on re-init
 
   // DOM refs — populated in init()
-  let display, startBtn, resetBtn, minusBtn, plusBtn, statusEl;
+  let display, startBtn, resetBtn, minusBtn, plusBtn, statusEl, countEl;
 
   function init() {
     display   = document.getElementById('pomo-display');
@@ -20,6 +20,7 @@ const Pomodoro = (() => {
     minusBtn  = document.getElementById('pomo-minus');
     plusBtn   = document.getElementById('pomo-plus');
     statusEl  = document.getElementById('pomo-status');
+    countEl   = document.getElementById('pomo-count');
 
     // Restore persisted state (but never auto-resume — user must click Start)
     const saved = Storage.getPomodoroState();
@@ -32,6 +33,7 @@ const Pomodoro = (() => {
 
     _updateDisplay();
     _updateStatus();
+    _updateCount();
 
     if (!_bound) {
       startBtn.addEventListener('click', _toggleStart);
@@ -109,6 +111,7 @@ const Pomodoro = (() => {
     // Switch modes
     const settings = Storage.getSettings();
     if (mode === 'work') {
+      _incrementCount();
       mode = 'break';
       remaining = (settings.breakDuration || 5) * 60;
     } else {
@@ -183,6 +186,32 @@ const Pomodoro = (() => {
         osc.stop(t + 0.9);
       });
     } catch (e) {}
+  }
+
+  function _todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function _incrementCount() {
+    const today = _todayStr();
+    const data  = Storage.getPomoCount();
+    const count = (data.date === today ? data.count : 0) + 1;
+    Storage.savePomoCount({ date: today, count });
+    _updateCount();
+  }
+
+  function _updateCount() {
+    if (!countEl) return;
+    const today = _todayStr();
+    const data  = Storage.getPomoCount();
+    const count = data.date === today ? data.count : 0;
+    if (count === 0) {
+      countEl.style.display = 'none';
+    } else {
+      countEl.style.display = 'block';
+      countEl.textContent = `✓ ${count} session${count === 1 ? '' : 's'} today`;
+    }
   }
 
   function _flashDisplay() {

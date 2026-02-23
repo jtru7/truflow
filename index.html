@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TRUFlow</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⏱️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -29,6 +33,7 @@
           <button id="pomo-plus" class="pomo-adj" title="Add 1 minute">+1</button>
         </div>
         <div id="pomo-status" class="pomo-status">Work Session</div>
+        <div id="pomo-count" class="pomo-count" style="display:none;"></div>
       </div>
 
       <div class="tracker-section">
@@ -85,10 +90,20 @@
 
     <!-- RIGHT PANEL: Daily To-Do List -->
     <section class="panel panel-right">
-      <h2 class="panel-heading">To-Do List</h2>
+      <h2 class="panel-heading">To-Do List <span id="todo-overdue-badge" class="todo-overdue-badge" style="display:none;"></span></h2>
       <div class="todo-add">
-        <input type="text" id="todo-input" class="todo-input" placeholder="Add a task...">
-        <button id="btn-add-todo" class="todo-add-btn">+</button>
+        <div class="todo-add-row1">
+          <input type="text" id="todo-input" class="todo-input" placeholder="Add a task...">
+          <button id="btn-add-todo" class="todo-add-btn">+</button>
+        </div>
+        <div class="todo-add-row2">
+          <div id="todo-priority-pick" class="todo-priority-pick">
+            <button class="todo-pri-btn" data-priority="H">H</button>
+            <button class="todo-pri-btn" data-priority="M">M</button>
+            <button class="todo-pri-btn" data-priority="L">L</button>
+          </div>
+          <input type="date" id="todo-due" class="todo-due-input">
+        </div>
       </div>
       <div id="todo-list" class="todo-list">
         <p class="placeholder-text">No tasks yet. Add one above.</p>
@@ -108,7 +123,55 @@
         <button id="settings-close" class="modal-close">&times;</button>
       </div>
       <div class="modal-body">
-        <p class="placeholder-text">Settings will be available in a future phase.</p>
+        <div class="settings-section">
+          <div class="settings-section-title">Pomodoro</div>
+          <div class="settings-row">
+            <label class="settings-label">Work Duration</label>
+            <input type="number" id="settings-pomo-duration" class="settings-number" min="1" max="60" value="25">
+            <span class="settings-unit">min</span>
+          </div>
+          <div class="settings-row">
+            <label class="settings-label">Break Duration</label>
+            <input type="number" id="settings-break-duration" class="settings-number" min="1" max="30" value="5">
+            <span class="settings-unit">min</span>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Time Tracker Buckets</div>
+          <div id="settings-buckets-list" class="settings-buckets-list"></div>
+          <div class="card-add-row">
+            <input type="text" id="settings-bucket-input" class="card-input card-input-sm" placeholder="New bucket name...">
+            <button id="settings-bucket-add" class="card-add-btn">+</button>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Kanban Labels</div>
+          <div id="settings-labels-list" class="settings-buckets-list"></div>
+          <div class="card-add-row">
+            <input type="text" id="settings-label-input" class="card-input card-input-sm" placeholder="New label name...">
+            <button id="settings-label-add" class="card-add-btn">+</button>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Google Sheets Sync</div>
+          <div class="settings-row">
+            <label class="settings-label">Script URL</label>
+            <input type="url" id="settings-sync-url" class="card-input"
+                   placeholder="https://script.google.com/macros/s/…/exec"
+                   style="flex:1; font-size:0.75rem;">
+          </div>
+          <p class="settings-sync-help">
+            Deploy an Apps Script web app from your Google Sheet and paste the URL above.
+            See <code>apps-script/Code.gs</code> in the project for setup instructions.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div></div>
+        <div class="modal-footer-actions">
+          <button id="settings-cancel" class="card-btn-secondary">Cancel</button>
+          <button id="settings-save" class="card-btn-primary">Save</button>
+        </div>
       </div>
     </div>
   </div>
@@ -148,11 +211,17 @@
           <label class="card-label">Notes / Details</label>
           <textarea id="card-description" class="card-input card-textarea" placeholder="Add context, links, or notes about this project..."></textarea>
         </div>
+        <!-- Time Goal -->
+        <div class="card-field">
+          <label class="card-label">Time Goal (hours)</label>
+          <input type="number" id="card-time-goal" class="card-input"
+                 placeholder="e.g. 10" min="0" step="0.5">
+        </div>
         <div class="card-field">
           <label class="card-label">Labels</label>
           <div id="card-labels-list" class="card-labels-list"></div>
           <div class="card-add-row">
-            <input type="text" id="card-label-input" class="card-input card-input-sm" placeholder="Add label...">
+            <select id="card-label-input" class="card-input card-input-sm"></select>
             <button id="card-label-add-btn" class="card-add-btn">+</button>
           </div>
         </div>
@@ -218,10 +287,53 @@
     </div>
   </div>
 
+  <!-- Task Edit Modal -->
+  <div id="todo-edit-modal" class="modal" style="display:none;">
+    <div class="modal-content modal-content-sm">
+      <div class="modal-header">
+        <h2>Edit Task</h2>
+        <button id="todo-edit-close" class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="card-field">
+          <label class="card-label">Task</label>
+          <input type="text" id="todo-edit-text" class="card-input" placeholder="Task...">
+        </div>
+        <div class="card-field">
+          <label class="card-label">Priority</label>
+          <div id="todo-edit-priority" class="todo-priority-pick">
+            <button class="todo-pri-btn" data-priority="H">H</button>
+            <button class="todo-pri-btn" data-priority="M">M</button>
+            <button class="todo-pri-btn" data-priority="L">L</button>
+          </div>
+        </div>
+        <div class="card-field">
+          <label class="card-label">Due Date</label>
+          <input type="date" id="todo-edit-due" class="card-input">
+        </div>
+        <div class="card-field">
+          <label class="card-label">Notes</label>
+          <textarea id="todo-edit-notes" class="card-input card-textarea"
+                    placeholder="Links, context, sub-steps..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div></div>
+        <div class="modal-footer-actions">
+          <button id="todo-edit-cancel" class="card-btn-secondary">Cancel</button>
+          <button id="todo-edit-save" class="card-btn-primary">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="js/storage.js"></script>
   <script src="js/pomodoro.js"></script>
   <script src="js/timeTracker.js"></script>
   <script src="js/kanban.js"></script>
+  <script src="js/todoList.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/sheetsSync.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

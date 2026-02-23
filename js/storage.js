@@ -82,6 +82,15 @@ const Storage = (() => {
     setItem('pomodoroState', state);
   }
 
+  // Pomodoro session count — { date: 'YYYY-MM-DD', count: N }
+  function getPomoCount() {
+    return getItem('pomoCount') || { date: '', count: 0 };
+  }
+
+  function savePomoCount(data) {
+    setItem('pomoCount', data);
+  }
+
   // Settings — { buckets, labels, pomoDuration, breakDuration }
   function getSettings() {
     return getItem('settings') || defaultSettings();
@@ -95,6 +104,7 @@ const Storage = (() => {
     return {
       buckets: ['Email', 'Meetings', 'Tinkering/Research', 'Whirlwind', 'EDCOR'],
       labels: [],
+      syncUrl: '',
       pomoDuration: 25,
       breakDuration: 5,
       kanbanColumns: ['queue', 'in-progress', 'on-hold', 'done', 'backburner']
@@ -161,6 +171,8 @@ const Storage = (() => {
     saveActiveTimer,
     getPomodoroState,
     savePomodoroState,
+    getPomoCount,
+    savePomoCount,
     getSettings,
     saveSettings,
     defaultSettings,

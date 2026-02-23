@@ -138,6 +138,7 @@
     <button id="pomo-minus">-1</button>
     <button id="pomo-plus">+1</button>
     <div id="pomo-status">Work Session</div>
+    <div id="pomo-count"></div>
   </div>
 
   <!-- Stub DOM elements required by TimeTracker module (hidden) -->
@@ -212,6 +213,7 @@
       <div id="card-checklist-list"></div>
       <input type="text" id="card-checklist-input">
       <button id="card-checklist-add-btn">+</button>
+      <input type="number" id="card-time-goal">
       <input type="radio" name="card-priority" value="H">
       <input type="radio" name="card-priority" value="M">
       <input type="radio" name="card-priority" value="L">
@@ -219,17 +221,37 @@
     </div>
   </div>
 
+  <!-- Stub DOM elements required by TodoList module (hidden) -->
+  <div style="display:none">
+    <span id="todo-overdue-badge"></span>
+    <input type="text" id="todo-input">
+    <button id="btn-add-todo">+</button>
+    <div id="todo-list"></div>
+    <div id="todo-overdue-section">
+      <div id="todo-overdue-list"></div>
+    </div>
+    <div id="todo-priority-pick">
+      <button class="todo-pri-btn" data-priority="H">H</button>
+      <button class="todo-pri-btn" data-priority="M">M</button>
+      <button class="todo-pri-btn" data-priority="L">L</button>
+    </div>
+    <input type="date" id="todo-due">
+    <textarea id="todo-edit-notes"></textarea>
+  </div>
+
   <!-- Source files under test -->
   <script src="../js/storage.js"></script>
   <script src="../js/pomodoro.js"></script>
   <script src="../js/timeTracker.js"></script>
   <script src="../js/kanban.js"></script>
+  <script src="../js/todoList.js"></script>
 
   <!-- Test files -->
   <script src="storage.test.js"></script>
   <script src="pomodoro.test.js"></script>
   <script src="timeTracker.test.js"></script>
   <script src="kanban.test.js"></script>
+  <script src="todoList.test.js"></script>
 
   <!-- Run all tests -->
   <script>
@@ -239,6 +261,7 @@
     Pomodoro.init();
     TimeTracker.init();
     Kanban.init();
+    TodoList.init();
 
     TestRunner.run();
   </script>
